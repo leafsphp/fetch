@@ -36,6 +36,20 @@ $res = Fetch::request([
 echo json_encode($res->data);
 ```
 
+## Installation
+
+You can quickly install leaf fetch with composer.
+
+```sh
+composer require leafs/fetch
+```
+
+If you want to keep up to date with all the changes with leaf fetch you can follow the main branch
+
+```sh
+composer require leafs/fetch dev-main
+```
+
 ## The `fetch` method
 
 Leaf fetch provides the fetch method as an easy way to make HTTP requests. This allows you to quickly make requests without bringing up the whole fetch class and without even having to build up your own request array.
