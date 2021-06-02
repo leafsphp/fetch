@@ -67,6 +67,38 @@ echo json_encode($res->data);
 
 ## The `Fetch` class
 
+The fetch class contains all the options and methods needed to make a network request.
+
+### baseUrl
+
+You might have noticed that all the requests above needed us to type a long URL to make the requests, however, we can add a base url so we don't have to type it over and over again.
+
+```php
+Fetch::baseUrl("https://jsonplaceholder.typicode.com");
+```
+
+And from there you can make requests like this:
+
+```php
+// make a get request
+$res = fetch("/todos");
+
+// make a post request
+$res = fetch("/posts", [
+  "title" => "foo",
+  "body" => "bar",
+  "userId" => 1,
+]);
+
+// use the get shortcut method
+$res = Fetch::get("/todos/10");
+
+// echo response
+echo json_encode($res);
+```
+
+### shortcut methods
+
 ## View Leaf's docs [here](https://leafphp.netlify.app/#/)
 
 Built with ❤ by [**Mychi Darko**](https://mychi.netlify.app)
