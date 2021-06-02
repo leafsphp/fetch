@@ -1,9 +1,9 @@
 <!-- markdownlint-disable no-inline-html -->
 <p align="center">
-    <br><br>
-    <img src="https://leaf-docs.netlify.app/images/logo.png" height="100"/>
-    <h1 align="center">Leaf HTTP Fetch</h1>
-    <br><br>
+  <br><br>
+  <img src="https://leaf-docs.netlify.app/images/logo.png" height="100"/>
+  <h1 align="center">Leaf HTTP Fetch</h1>
+  <br><br>
 </p>
 
 # Leaf Fetch
@@ -12,7 +12,7 @@
 [![Total Downloads](https://poser.pugx.org/leafs/leaf/downloads)](https://packagist.org/packages/leafs/leaf)
 [![License](https://poser.pugx.org/leafs/leaf/license)](https://packagist.org/packages/leafs/leaf) -->
 
-Clean, simple, developer friendly interface for making network requests with PHP. Fetch is based on curl and uses elements from Unirest PHP and an API that closely resembles Axios. ALl of these combined makes Fetch the best and simplest way to make PHP network requests.
+Clean, simple, developer friendly interface for making network requests with PHP. Fetch is based on curl and uses elements from Unirest PHP and an API that closely resembles Axios. All of these combined makes Fetch the best and simplest way to make PHP network requests.
 
 ## fetch example
 
@@ -112,6 +112,22 @@ echo json_encode($res);
 ```
 
 ### shortcut methods
+
+The fetch class comes with shortcut methods named after http methods `get`, `post`, `put`, `patch`, ...
+
+```php
+$res = Fetch::post("/posts", [
+  "title" => "foo",
+  "body" => "bar",
+  "userId" => 2,
+]);
+
+$res = Fetch::get("/todos/10");
+
+Fetch::delete("/todos/10");
+
+// ...
+```
 
 ## View Leaf's docs [here](https://leafphp.netlify.app/#/)
 
