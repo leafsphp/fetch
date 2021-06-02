@@ -19,10 +19,7 @@ Clean, simple, developer friendly interface for making network requests with PHP
 ```php
 use function Leaf\fetch;
 
-$res = fetch([
-  "method" => "GET",
-  "url" => 'https://jsonplaceholder.typicode.com/todos/1',
-]);
+$res = fetch("https://jsonplaceholder.typicode.com/todos/");
 
 echo json_encode($res->data);
 ```
@@ -33,12 +30,42 @@ You can also use the fetch class
 use Leaf\Fetch;
 
 $res = Fetch::request([
-  "method" => "GET",
   "url" => 'https://jsonplaceholder.typicode.com/todos/1',
 ]);
 
 echo json_encode($res->data);
 ```
+
+## The `fetch` method
+
+Leaf fetch provides the fetch method as an easy way to make HTTP requests. This allows you to quickly make requests without bringing up the whole fetch class and without even having to build up your own request array.
+
+```php
+// make a get request
+$res = fetch("https://jsonplaceholder.typicode.com/todos/");
+
+// make a post request
+$res = fetch("https://jsonplaceholder.typicode.com/posts", [
+  "title" => "foo",
+  "body" => "bar",
+  "userId" => 1,
+]);
+
+// build a custom request array
+$res = fetch([
+  "method" => "GET",
+  "url" => 'https://jsonplaceholder.typicode.com/todos/1',
+  "data" => [
+    "firstName" => 'Fred',
+    "lastName" => 'Flintstone'
+  ]
+]);
+
+// get response body
+echo json_encode($res->data);
+```
+
+## The `Fetch` class
 
 ## View Leaf's docs [here](https://leafphp.netlify.app/#/)
 
