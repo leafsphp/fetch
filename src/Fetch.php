@@ -33,7 +33,7 @@ class Fetch
         // `baseURL` will be prepended to `url` unless `url` is absolute.
         // It can be convenient to set `baseURL` for an instance of axios to pass relative URLs
         // to methods of that instance.
-        "baseURL" => "",
+        "baseUrl" => "",
 
         // `transformRequest` allows changes to the request data before it is sent to the server
         // This is only applicable for request methods 'PUT', 'POST', 'PATCH' and 'DELETE'
@@ -181,7 +181,7 @@ class Fetch
 
     public static function baseUrl($url)
     {
-        static::$options["baseURL"] = $url;
+        static::$options["baseUrl"] = $url;
     }
 
     /**
@@ -265,12 +265,10 @@ class Fetch
             }
 
             $request["url"] .= urldecode(http_build_query(self::buildHTTPCurlQuery($request["data"])));
-
-            echo $request["url"];
         }
 
         $curl_base_options = [
-            CURLOPT_URL => $request["url"],
+            CURLOPT_URL => $request["baseUrl"] . $request["url"],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_MAXREDIRS => $request["maxRedirects"],
