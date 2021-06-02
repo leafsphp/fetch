@@ -205,7 +205,7 @@ class Fetch
     /**
      * Make a post request
      */
-    public static function post($url, $data, $config)
+    public static function post($url, $data, $config = [])
     {
         return static::request(array_merge($config, ["url" => $url, "data" => $data, "method" => static::POST]));
     }
@@ -213,7 +213,7 @@ class Fetch
     /**
      * Make a put request
      */
-    public static function put($url, $data, $config)
+    public static function put($url, $data, $config = [])
     {
         return static::request(array_merge($config, ["url" => $url, "data" => $data, "method" => static::PUT]));
     }
@@ -221,7 +221,7 @@ class Fetch
     /**
      * Make a patch request
      */
-    public static function patch($url, $data, $config)
+    public static function patch($url, $data, $config = [])
     {
         return static::request(array_merge($config, ["url" => $url, "data" => $data, "method" => static::PATCH]));
     }
@@ -229,7 +229,7 @@ class Fetch
     /**
      * Make a delete request
      */
-    public static function delete($url, $config)
+    public static function delete($url, $config = [])
     {
         return static::request(array_merge($config, ["url" => $url, "method" => static::DELETE]));
     }
@@ -237,7 +237,7 @@ class Fetch
     /**
      * Make an options request
      */
-    public static function options($url, $config)
+    public static function options($url, $config = [])
     {
         return static::request(array_merge($config, ["url" => $url, "method" => static::OPTIONS]));
     }
