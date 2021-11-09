@@ -8,9 +8,9 @@
 
 # Leaf Fetch
 
-<!-- [![Latest Stable Version](https://poser.pugx.org/leafs/leaf/v/stable)](https://packagist.org/packages/leafs/leaf)
-[![Total Downloads](https://poser.pugx.org/leafs/leaf/downloads)](https://packagist.org/packages/leafs/leaf)
-[![License](https://poser.pugx.org/leafs/leaf/license)](https://packagist.org/packages/leafs/leaf) -->
+[![Latest Stable Version](https://poser.pugx.org/leafs/fetch/v/stable)](https://packagist.org/packages/leafs/leaf)
+[![Total Downloads](https://poser.pugx.org/leafs/fetch/downloads)](https://packagist.org/packages/leafs/leaf)
+[![License](https://poser.pugx.org/leafs/fetch/license)](https://packagist.org/packages/leafs/leaf)
 
 Clean, simple, developer friendly interface for making network requests with PHP. Fetch is based on curl and uses elements from Unirest PHP and an API that closely resembles Axios. All of these combined makes Fetch the best and simplest way to make PHP network requests.
 
@@ -305,6 +305,12 @@ This is the array which is used to construct the request to be sent. The availab
   "curl" => [],
 ];
 ```
+
+## Our contributors
+
+And to all our contributors, we love you all ❤️
+
+<a href="https://github.com/leafsphp/fetch/graphs/contributors" target="_blank"><img src="https://opencollective.com/leafphp/contributors.svg?width=890" /></a>
 
 ## View Leaf's docs [here](https://leafphp.netlify.app/#/)
 

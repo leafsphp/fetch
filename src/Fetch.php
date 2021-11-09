@@ -290,8 +290,8 @@ class Fetch
             curl_setopt(static::$handler, CURLOPT_TIMEOUT, $request["timeout"]);
         }
 
-        // if (self::$cookie) {
-        //     curl_setopt(static::$handler, CURLOPT_COOKIE, self::$cookie);
+        // if ($request["cookie"]) {
+        //     curl_setopt(static::$handler, CURLOPT_COOKIE, $request["cookie"]);
         // }
 
         // if (self::$cookieFile) {
