@@ -24,7 +24,10 @@
     "autoload": {
         "psr-4": {
             "Leaf\\": "src"
-        }
+        },
+        "files": [
+            "src/functions.php"
+        ]
     },
     "minimum-stability": "stable",
     "require": {
