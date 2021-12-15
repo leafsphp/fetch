@@ -186,6 +186,7 @@ class Fetch
 
     /**
      * Base method for network requests
+     * @throws \Exception
      */
     public static function request($options)
     {
@@ -196,6 +197,7 @@ class Fetch
 
     /**
      * Make a get request
+     * @throws \Exception
      */
     public static function get($url, $config = [])
     {
@@ -204,6 +206,7 @@ class Fetch
 
     /**
      * Make a post request
+     * @throws \Exception
      */
     public static function post($url, $data, $config = [])
     {
@@ -212,6 +215,7 @@ class Fetch
 
     /**
      * Make a put request
+     * @throws \Exception
      */
     public static function put($url, $data, $config = [])
     {
@@ -220,6 +224,7 @@ class Fetch
 
     /**
      * Make a patch request
+     * @throws \Exception
      */
     public static function patch($url, $data, $config = [])
     {
@@ -228,6 +233,7 @@ class Fetch
 
     /**
      * Make a delete request
+     * @throws \Exception
      */
     public static function delete($url, $config = [])
     {
@@ -236,12 +242,16 @@ class Fetch
 
     /**
      * Make an options request
+     * @throws \Exception
      */
     public static function options($url, $config = [])
     {
         return static::request(array_merge($config, ["url" => $url, "method" => static::OPTIONS]));
     }
 
+    /**
+     * @throws \Exception
+     */
     private static function call($request)
     {
         static::$handler = curl_init();
@@ -372,7 +382,7 @@ class Fetch
      * 
      * @author Mashape (https://www.mashape.com)
      */
-    private static function parseHeaders($raw_headers)
+    private static function parseHeaders(string $raw_headers): array
     {
         if (function_exists('http_parse_headers')) {
             return \http_parse_headers($raw_headers);
@@ -419,19 +429,15 @@ class Fetch
     /**
      * This function is useful for serializing multidimensional arrays, and avoid getting
      * the 'Array to string conversion' notice
-     * @param array|object $data array to flatten.
+     * @param array $data array to flatten.
      * @param bool|string $parent parent key or false if no parent
      * @return array
      * 
      * @author Mashape (https://www.mashape.com)
      */
-    public static function buildHTTPCurlQuery($data, $parent = false)
+    public static function buildHTTPCurlQuery(array $data, $parent = false): array
     {
         $result = array();
-
-        if (is_object($data)) {
-            $data = get_object_vars($data);
-        }
 
         foreach ($data as $key => $value) {
             if ($parent) {
@@ -453,8 +459,9 @@ class Fetch
 
 /**
  * Shortcut method for making network requests.
- * 
+ *
  * @param array|string $options The url or request to hit.
+ * @throws \Exception
  */
 function fetch($options, $params = [])
 {
