@@ -6,7 +6,7 @@
   <br><br>
 </p>
 
-# Leaf Fetch
+# Leaf Fetchs
 
 [![Latest Stable Version](https://poser.pugx.org/leafs/fetch/v/stable)](https://packagist.org/packages/leafs/leaf)
 [![Total Downloads](https://poser.pugx.org/leafs/fetch/downloads)](https://packagist.org/packages/leafs/leaf)
@@ -36,17 +36,33 @@ $res = Fetch::request([
 echo json_encode($res->data);
 ```
 
-## Installation
+Or with Leaf 3's functional mode:
 
-You can quickly install leaf fetch with composer.
+```php
+$res = fetch("https://jsonplaceholder.typicode.com/todos/");
 
-```sh
-composer require leafs/fetch
+echo json_encode($res->data);
 ```
 
-If you want to keep up to date with all the changes with leaf fetch you can follow the main branch
+## Installation
+
+You can quickly install leaf fetch with the Leaf CLI
 
 ```sh
+# latest stable
+leaf install fetch
+
+# dev version
+leaf install fetch@dev-main
+```
+
+Or with composer:
+
+```sh
+# latest stable
+composer require leafs/fetch
+
+# dev version
 composer require leafs/fetch dev-main
 ```
 
