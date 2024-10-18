@@ -1,16 +1,24 @@
 <?php
 
-use function Leaf\fetch as LeafFetch;
+use Leaf\Fetch;
 
 if (!function_exists('fetch')) {
     /**
      * Shortcut method for making network requests.
      *
-     * @param array|string $options The url or request to hit.
-     * @throws Exception
+     * @param array|string $data The url or request to hit.
+     * @throws \Exception
      */
-    function fetch($options, $params = [])
+    function fetch($data = null)
     {
-        return LeafFetch($options, $params);
+        if (is_string($data)) {
+            $data = ['url' => $data];
+        }
+
+        if (!$data) {
+            return new Fetch;
+        }
+
+        return Fetch::request($data);
     }
 }

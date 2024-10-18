@@ -456,23 +456,3 @@ class Fetch
         return $result;
     }
 }
-
-/**
- * Shortcut method for making network requests.
- *
- * @param array|string $options The url or request to hit.
- * @throws \Exception
- */
-function fetch($options, $params = [])
-{
-    if (is_string($options)) {
-        $options = ["url" => $options];
-
-        if (count($params) > 0) {
-            $options["method"] = Fetch::POST;
-            $options["data"] = $params;
-        }
-    }
-
-    return Fetch::request($options);
-}
