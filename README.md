@@ -217,7 +217,7 @@ This is the array which is used to construct the request to be sent. The availab
   // - Node "only" => Stream, Buffer
   "data" => [],
 
-  // `timeout` specifies the number of milliseconds before the request times out.
+  // `timeout` specifies the number of seconds before the request times out.
   // If the request takes longer than `timeout`, the request will be aborted.
   "timeout" => 0, // default is `0` (no timeout)
 
