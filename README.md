@@ -1,47 +1,41 @@
 <!-- markdownlint-disable no-inline-html -->
 <p align="center">
   <br><br>
-  <img src="https://leaf-docs.netlify.app/images/logo.png" height="100"/>
+  <img src="https://leafphp.dev/logo-circle.png" height="100"/>
   <h1 align="center">Fetch</h1>
   <br><br>
 </p>
-
-# Leaf Fetchs
 
 [![Latest Stable Version](https://poser.pugx.org/leafs/fetch/v/stable)](https://packagist.org/packages/leafs/leaf)
 [![Total Downloads](https://poser.pugx.org/leafs/fetch/downloads)](https://packagist.org/packages/leafs/leaf)
 [![License](https://poser.pugx.org/leafs/fetch/license)](https://packagist.org/packages/leafs/leaf)
 
-Clean, simple, developer friendly interface for making network requests with PHP. Fetch is based on curl and uses elements from Unirest PHP and an API that closely resembles Axios. All of these combined makes Fetch the best and simplest way to make PHP network requests.
+When building your applications, you will probably end up needing to call APIs or fetch data from external sources. Leaf provides a simple and easy way to do this using Fetch. Fetch provides a clean and modern interface for making network requests in PHP. It is inspired by JavaScript's Fetch API, Axios and uses elements from Unirest PHP.
 
 ## fetch example
 
 ```php
-use function Leaf\fetch;
+$res = fetch('https://jsonplaceholder.typicode.com/todos/');
 
-$res = fetch("https://jsonplaceholder.typicode.com/todos/");
-
-echo json_encode($res->data);
+// data returned is saved in the $data property just like axios
+response()->json($res->data);
 ```
 
-You can also use the fetch class
+You can also use the entire fetch object to make requests:
 
 ```php
-use Leaf\Fetch;
-
-$res = Fetch::request([
-  "url" => 'https://jsonplaceholder.typicode.com/todos/1',
+$res = fetch()->post('https://jsonplaceholder.typicode.com/posts', [
+  'title' => 'foo',
+  'body' => 'bar',
+  'userId' => 1
 ]);
 
-echo json_encode($res->data);
-```
+fetch()->put(...);
+fetch()->patch(...);
+fetch()->delete(...);
+fetch()->options(...);
 
-Or with Leaf 3's functional mode:
-
-```php
-$res = fetch("https://jsonplaceholder.typicode.com/todos/");
-
-echo json_encode($res->data);
+response()->json($res->data);
 ```
 
 ## Installation
@@ -49,118 +43,16 @@ echo json_encode($res->data);
 You can quickly install leaf fetch with the Leaf CLI
 
 ```sh
-# latest stable
 leaf install fetch
-
-# dev version
-leaf install fetch@dev-main
 ```
 
 Or with composer:
 
 ```sh
-# latest stable
 composer require leafs/fetch
-
-# dev version
-composer require leafs/fetch dev-main
 ```
 
-## The `fetch` method
-
-Leaf fetch provides the fetch method as an easy way to make HTTP requests. This allows you to quickly make requests without bringing up the whole fetch class and without even having to build up your own request array.
-
-```php
-// make a get request
-$res = fetch("https://jsonplaceholder.typicode.com/todos/");
-
-// make a post request
-$res = fetch("https://jsonplaceholder.typicode.com/posts", [
-  "title" => "foo",
-  "body" => "bar",
-  "userId" => 1,
-]);
-
-// build a custom request array
-$res = fetch([
-  "method" => "GET",
-  "url" => 'https://jsonplaceholder.typicode.com/todos/1',
-  "data" => [
-    "firstName" => 'Fred',
-    "lastName" => 'Flintstone'
-  ]
-]);
-
-// get response body
-echo json_encode($res->data);
-```
-
-## The `Fetch` class
-
-The fetch class contains all the options and methods needed to make a network request.
-
-### baseUrl
-
-You might have noticed that all the requests above needed us to type a long URL to make the requests, however, we can add a base url so we don't have to type it over and over again.
-
-```php
-Fetch::baseUrl("https://jsonplaceholder.typicode.com");
-```
-
-And from there you can make requests like this:
-
-```php
-// make a get request
-$res = fetch("/todos");
-
-// make a post request
-$res = fetch("/posts", [
-  "title" => "foo",
-  "body" => "bar",
-  "userId" => 1,
-]);
-
-// use the get shortcut method
-$res = Fetch::get("/todos/10");
-
-// echo response
-echo json_encode($res);
-```
-
-### shortcut methods
-
-The fetch class comes with shortcut methods named after http methods `get`, `post`, `put`, `patch`, ...
-
-```php
-$res = Fetch::post("/posts", [
-  "title" => "foo",
-  "body" => "bar",
-  "userId" => 2,
-]);
-
-$res = Fetch::get("/todos/10");
-
-Fetch::delete("/todos/10");
-
-// ...
-```
-
-### request
-
-As you've seen earlier, the fetch class also provides a `request` method which is also used under the hood by the `fetch` function. `request` allows you to manually build up your request object with whatever data you need.
-
-```php
-use Leaf\Fetch;
-
-$res = Fetch::request([
-  "method" => "GET",
-  "url" => "https://jsonplaceholder.typicode.com/todos",
-]);
-
-echo json_encode($res->data);
-```
-
-### Request object
+## Options
 
 This is the array which is used to construct the request to be sent. The available fields are:
 
