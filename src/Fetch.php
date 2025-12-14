@@ -260,13 +260,22 @@ class Fetch
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_MAXREDIRS => $request["maxRedirects"],
-            CURLOPT_HTTPHEADER => $request["headers"],
             CURLOPT_HEADER => true,
             CURLOPT_SSL_VERIFYPEER => $request["verifyPeer"],
             CURLOPT_SSL_VERIFYHOST => $request["verifyHost"] === false ? 0 : 2,
             // If an empty string, '', is set, a header containing all supported encoding types is sent
             CURLOPT_ENCODING => ""
         ];
+
+        if (!empty($request["headers"])) {
+            $formattedHeaders = [];
+
+            foreach ($request["headers"] as $key => $value) {
+                $formattedHeaders[] = $key . ': ' . $value;
+            }
+
+            $curl_base_options[CURLOPT_HTTPHEADER] = $formattedHeaders;
+        }
 
         if ($request["method"] !== static::GET) {
             if ($request["method"] === static::POST) {
@@ -279,7 +288,7 @@ class Fetch
                 $curl_base_options[CURLOPT_CUSTOMREQUEST] = $request["method"];
             }
 
-            $curl_base_options[CURLOPT_POSTFIELDS] = $request["data"];
+            $curl_base_options[CURLOPT_POSTFIELDS] = json_encode($request["data"]);
         } else if (\is_array($request["data"])) {
             if (strpos($request["url"], '?') !== false) {
                 $request["url"] .= '&';
