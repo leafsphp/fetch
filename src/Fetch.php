@@ -157,11 +157,11 @@ class Fetch
         // supplies credentials.
         // This will set an `Proxy-Authorization` header, overwriting any existing
         // `Proxy-Authorization` custom headers you have set using `headers`.
-        // If the proxy server uses HTTPS, then you must set the protocol to `https`. 
+        // If the proxy server uses HTTPS, then you must set the protocol to `https`.
         "proxy" => [],
 
-        // `decompress` indicates whether or not the response body should be decompressed 
-        // automatically. If set to `true` will also remove the 'content-encoding' header 
+        // `decompress` indicates whether or not the response body should be decompressed
+        // automatically. If set to `true` will also remove the 'content-encoding' header
         // from the responses objects of all decompressed responses
         // - Node only (XHR cannot turn off decompression)
         "decompress" => true, // default
@@ -256,29 +256,7 @@ class Fetch
     {
         static::$handler = curl_init();
 
-        if ($request["method"] !== static::GET) {
-            if ($request["method"] === static::POST) {
-                curl_setopt(static::$handler, CURLOPT_POST, true);
-            } else {
-                if ($request["method"] === static::HEAD) {
-                    curl_setopt(static::$handler, CURLOPT_NOBODY, true);
-                }
-                curl_setopt(static::$handler, CURLOPT_CUSTOMREQUEST, $request["method"]);
-            }
-
-            curl_setopt(static::$handler, CURLOPT_POSTFIELDS, $request["data"]);
-        } else if (is_array($request["data"])) {
-            if (strpos($request["url"], '?') !== false) {
-                $request["url"] .= '&';
-            } else {
-                $request["url"] .= '?';
-            }
-
-            $request["url"] .= urldecode(http_build_query(self::buildHTTPCurlQuery($request["data"])));
-        }
-
         $curl_base_options = [
-            CURLOPT_URL => $request["baseUrl"] . $request["url"],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_MAXREDIRS => $request["maxRedirects"],
@@ -290,8 +268,46 @@ class Fetch
             CURLOPT_ENCODING => ""
         ];
 
+        if ($request["method"] !== static::GET) {
+            if ($request["method"] === static::POST) {
+                $curl_base_options[CURLOPT_POST] = true;
+            } else {
+                if ($request["method"] === static::HEAD) {
+                    $curl_base_options[CURLOPT_NOBODY] = true;
+                }
+
+                $curl_base_options[CURLOPT_CUSTOMREQUEST] = $request["method"];
+            }
+
+            $curl_base_options[CURLOPT_POSTFIELDS] = $request["data"];
+        } else if (\is_array($request["data"])) {
+            if (strpos($request["url"], '?') !== false) {
+                $request["url"] .= '&';
+            } else {
+                $request["url"] .= '?';
+            }
+
+            $request["url"] .= urldecode(http_build_query(self::buildHTTPCurlQuery($request["data"])));
+        }
+
+        $curl_base_options[CURLOPT_URL] = $request["baseUrl"] . $request["url"];
+
+        // supporting deprecated http auth method
+        if (!empty($request['auth'] ?? [])) {
+            // $curl_base_options = \array_merge($curl_base_options, [
+            //     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+            //     CURLOPT_USERPWD => $request['auth']['username'] . ':' . $request['auth']['password']
+            // ]);
+            $curl_base_options[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
+            $curl_base_options[CURLOPT_USERPWD] = $request['auth']['username'] . ':' . $request['auth']['password'];
+        }
+
         foreach ($request["curl"] as $key => $value) {
             $curl_base_options[$key] = $value;
+        }
+
+        if (($request['headers']['Content-Type'] ?? null) === 'application/x-www-form-urlencoded' && $request['method'] !== static::GET) {
+            $curl_base_options[CURLOPT_POSTFIELDS] = http_build_query($request['data']);
         }
 
         curl_setopt_array(static::$handler, $curl_base_options);
@@ -307,14 +323,6 @@ class Fetch
         // if (self::$cookieFile) {
         //     curl_setopt(static::$handler, CURLOPT_COOKIEFILE, self::$cookieFile);
         //     curl_setopt(static::$handler, CURLOPT_COOKIEJAR, self::$cookieFile);
-        // }
-
-        // supporting deprecated http auth method
-        // if (!empty($username)) {
-        //     curl_setopt_array(static::$handler, array(
-        //         CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-        //         CURLOPT_USERPWD => $username . ':' . $password
-        //     ));
         // }
 
         // if (!empty($request["auth"]["user"])) {
@@ -335,9 +343,16 @@ class Fetch
         //     ]);
         // }
 
-        $response   = curl_exec(static::$handler);
-        $error      = curl_error(static::$handler);
-        $info       = self::getInfo();
+        // debug curl, get built request as a dump
+        // response()->json([
+        //     'curl_request' => curl_getinfo(static::$handler),
+        //     'options' => $curl_base_options,
+        // ]);
+        // die;
+
+        $response = curl_exec(static::$handler);
+        $error = curl_error(static::$handler);
+        $info = self::getInfo();
 
         if ($error) {
             throw new \Exception($error);
@@ -345,9 +360,9 @@ class Fetch
 
         // Split the full response in its headers and body
         $header_size = $info['header_size'];
-        $header      = substr($response, 0, $header_size);
-        $body        = substr($response, $header_size);
-        $httpCode    = $info['http_code'];
+        $header = substr($response, 0, $header_size);
+        $body = substr($response, $header_size);
+        $httpCode = $info['http_code'];
 
         if (!$request["rawResponse"]) {
             $body = json_decode($body);
@@ -379,7 +394,7 @@ class Fetch
      * http://php.net/manual/en/function.http-parse-headers.php#112986
      * @param string $raw_headers raw headers
      * @return array
-     * 
+     *
      * @author Mashape (https://www.mashape.com)
      */
     private static function parseHeaders(string $raw_headers): array
@@ -432,7 +447,7 @@ class Fetch
      * @param array $data array to flatten.
      * @param bool|string $parent parent key or false if no parent
      * @return array
-     * 
+     *
      * @author Mashape (https://www.mashape.com)
      */
     public static function buildHTTPCurlQuery(array $data, $parent = false): array
