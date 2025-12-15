@@ -32,7 +32,6 @@
     "minimum-stability": "dev",
 	"prefer-stable": true,
     "require": {
-        "ext-curl": "*",
-        "leafs/alchemy": "dev-next"
+        "ext-curl": "*"
     }
 }

@@ -352,13 +352,6 @@ class Fetch
         //     ]);
         // }
 
-        // debug curl, get built request as a dump
-        // response()->json([
-        //     'curl_request' => curl_getinfo(static::$handler),
-        //     'options' => $curl_base_options,
-        // ]);
-        // die;
-
         $response = curl_exec(static::$handler);
         $error = curl_error(static::$handler);
         $info = self::getInfo();
