@@ -10,7 +10,7 @@
         "network",
         "client"
     ],
-    "homepage": "https://github.com/leafsphp/redis",
+    "homepage": "https://github.com/leafsphp/fetch",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -30,8 +30,29 @@
         ]
     },
     "minimum-stability": "dev",
-	"prefer-stable": true,
+    "prefer-stable": true,
     "require": {
-        "ext-curl": "*"
-    }
+        "php": "^8.2",
+        "ext-curl": "*",
+        "ext-json": "*"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "require-dev": {
+        "pestphp/pest": "*",
+        "friendsofphp/php-cs-fixer": "*",
+        "leafs/alchemy": "v5.x-dev"
+    },
+    "scripts": {
+        "test": "@php vendor/bin/alchemy test",
+        "alchemy": "@php vendor/bin/alchemy all",
+        "lint": "@php vendor/bin/alchemy lint",
+        "fmt": "@php vendor/bin/alchemy fmt",
+        "refactor": "@php vendor/bin/alchemy refactor",
+        "analyse": "@php vendor/bin/alchemy analyse",
+        "ci": "@php vendor/bin/alchemy ci"
+    },
 }

@@ -2,3 +2,9 @@ test
 Experimental
 vendor
 composer.lock
+
+# Alchemy-generated (kept for IDE support, never committed)
+phpunit.xml
+.phpunit.result.cache
+.alchemy
+.php-cs-fixer.cache
