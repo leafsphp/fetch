@@ -54,5 +54,5 @@
         "refactor": "@php vendor/bin/alchemy refactor",
         "analyse": "@php vendor/bin/alchemy analyse",
         "ci": "@php vendor/bin/alchemy ci"
-    },
+    }
 }
