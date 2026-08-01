@@ -9,179 +9,86 @@ namespace Leaf;
  */
 class Fetch
 {
-    const HEAD = 'HEAD';
-    const GET = 'GET';
-    const POST = 'POST';
-    const PUT = 'PUT';
-    const PATCH = 'PATCH';
-    const DELETE = 'DELETE';
-    const OPTIONS = 'OPTIONS';
-    const OVERRIDE = '_METHOD';
+    public const HEAD = 'HEAD';
+    public const GET = 'GET';
+    public const POST = 'POST';
+    public const PUT = 'PUT';
+    public const PATCH = 'PATCH';
+    public const DELETE = 'DELETE';
+    public const OPTIONS = 'OPTIONS';
+    public const OVERRIDE = '_METHOD';
 
     private static $handler = null;
 
     /**
-     * Default fetch options
+     * Default fetch options. Every option listed here is honoured —
+     * pass any of them per-request or set them app-wide with Fetch::config().
      */
     protected static $options = [
         // `url` is the server URL that will be used for the request
-        "url" => null,
+        'url' => null,
 
         // `method` is the request method to be used when making the request
-        "method" => "GET", // default
+        'method' => 'GET',
 
-        // `baseURL` will be prepended to `url` unless `url` is absolute.
-        // It can be convenient to set `baseURL` for an instance of axios to pass relative URLs
-        // to methods of that instance.
-        "baseUrl" => "",
+        // `baseUrl` is prepended to `url` unless `url` is absolute (starts with http:// or https://)
+        'baseUrl' => '',
 
-        // `transformRequest` allows changes to the request data before it is sent to the server
-        // This is only applicable for request methods 'PUT', 'POST', 'PATCH' and 'DELETE'
-        // The last function in the array must return a string or an instance of Buffer, ArrayBuffer,
-        // FormData or Stream
-        // You may modify the headers object.
-        // "transformRequest" => function ($data, $headers) {
-        //     // Do whatever you want to transform the data
+        // `headers` are custom headers to be sent with the request
+        'headers' => [],
 
-        //     return $data;
-        // },
+        // `params` are URL query parameters appended to the URL for ANY method.
+        // On GET requests, `data` behaves the same way.
+        'params' => [],
 
-        // `transformResponse` allows changes to the response data to be made before
-        // it is passed to then/catch
-        // "transformResponse" => function ($data) {
-        //     // Do whatever you want to transform the data
+        // `data` is the data sent as the request body. Arrays are JSON encoded
+        // by default; set a Content-Type of application/x-www-form-urlencoded
+        // to send classic form encoding instead. On GET requests, `data` is
+        // appended to the URL as query parameters.
+        'data' => [],
 
-        //     return $data;
-        // },
+        // `timeout` specifies the number of SECONDS before the request times out.
+        // Default is 0 (no timeout).
+        'timeout' => 0,
 
-        // `headers` are custom headers to be sent
-        "headers" => [],
+        // `auth` enables HTTP Basic auth: ['username' => ..., 'password' => ...]
+        // For Bearer tokens, use an Authorization header instead.
+        'auth' => [],
 
-        // `params` are the URL parameters to be sent with the request
-        // Must be a plain object or a URLSearchParams object
-        "params" => [],
-
-        // `paramsSerializer` is an optional function in charge of serializing `params`
-        // (e.g. https://www.npmjs.com/package/qs, http://api.jquery.com/jquery.param/)
-        // "paramsSerializer" => function ($params) {
-        //     return Qs.stringify($params, ["arrayFormat" => "brackets"]);
-        // },
-
-        // `data` is the data to be sent as the request body
-        // Only applicable for request methods 'PUT', 'POST', 'DELETE , and 'PATCH'
-        // When no `transformRequest` is set, must be of one of the following types:
-        // - string, plain object, ArrayBuffer, ArrayBufferView, URLSearchParams
-        // - Browser "only" => FormData, File, Blob
-        // - Node "only" => Stream, Buffer
-        "data" => [],
-
-        // `timeout` specifies the number of milliseconds before the request times out.
-        // If the request takes longer than `timeout`, the request will be aborted.
-        "timeout" => 0, // default is `0` (no timeout)
-
-        // `withCredentials` indicates whether or not cross-site Access-Control requests
-        // should be made using credentials
-        "withCredentials" => false, // default
-
-        // `adapter` allows custom handling of requests which makes testing easier.
-        // Return a promise and supply a valid response (see lib/adapters/README.md).
-        // "adapter" => function ($config) {
-        //     /* ... */
-        // },
-
-        // `auth` indicates that HTTP Basic auth should be used, and supplies credentials.
-        // This will set an `Authorization` header, overwriting any existing
-        // `Authorization` custom headers you have set using `headers`.
-        // Please note that only HTTP Basic auth is configurable through this parameter.
-        // For Bearer tokens and such, use `Authorization` custom headers instead.
-        "auth" => [],
-
-        // `responseType` indicates the type of data that the server will respond with
-        // options "are" => 'arraybuffer', 'document', 'json', 'text', 'stream'
-        //   browser "only" => 'blob'
-        "responseType" => "json", // default
-
-        // `responseEncoding` indicates encoding to use for decoding responses (Node.js only)
-        // "Note" => Ignored for `responseType` of 'stream' or client-side requests
-        "responseEncoding" => "utf8", // default
-
-        // `xsrfCookieName` is the name of the cookie to use as a value for xsrf token
-        "xsrfCookieName" => "XSRF-TOKEN", // default
-
-        // `xsrfHeaderName` is the name of the http header that carries the xsrf token value
-        "xsrfHeaderName" => "X-XSRF-TOKEN", // default
-
-        // `onUploadProgress` allows handling of progress events for uploads
-        // browser only
-        // "onUploadProgress" => function ($progressEvent) {
-        //     // Do whatever you want with the native progress event
-        // },
-
-        // `onDownloadProgress` allows handling of progress events for downloads
-        // browser only
-        // "onDownloadProgress" => function ($progressEvent) {
-        //     // Do whatever you want with the native progress event
-        // },
-
-        // `maxContentLength` defines the max size of the http response content in bytes allowed in node.js
-        "maxContentLength" => 2000,
-
-        // `maxBodyLength` (Node only option) defines the max size of the http request content in bytes allowed
-        "maxBodyLength" => 2000,
-
-        // `validateStatus` defines whether to resolve or reject the promise for a given
-        // HTTP response status code. If `validateStatus` returns `true` (or is set to `null`
-        // or `undefined`), the promise will be resolved; otherwise, the promise will be
-        // rejected.
-        // "validateStatus" => function ($status) {
-        //     return $status >= 200 && $status < 300; // default
-        // },
-
-        // `maxRedirects` defines the maximum number of redirects to follow in node.js.
+        // `maxRedirects` defines the maximum number of redirects to follow.
         // If set to 0, no redirects will be followed.
-        "maxRedirects" => 5, // default
+        'maxRedirects' => 5,
 
-        // `socketPath` defines a UNIX Socket to be used in node.js.
-        // e.g. '/var/run/docker.sock' to send requests to the docker daemon.
-        // Only either `socketPath` or `proxy` can be specified.
-        // If both are specified, `socketPath` is used.
-        "socketPath" => null, // default
+        // If true, fetch will NOT try to parse the response body as JSON
+        'rawResponse' => false,
 
-        // `proxy` defines the hostname, port, and protocol of the proxy server.
-        // You can also define your proxy using the conventional `http_proxy` and
-        // `https_proxy` environment variables. If you are using environment variables
-        // for your proxy configuration, you can also define a `no_proxy` environment
-        // variable as a comma-separated list of domains that should not be proxied.
-        // Use `false` to disable proxies, ignoring environment variables.
-        // `auth` indicates that HTTP Basic auth should be used to connect to the proxy, and
-        // supplies credentials.
-        // This will set an `Proxy-Authorization` header, overwriting any existing
-        // `Proxy-Authorization` custom headers you have set using `headers`.
-        // If the proxy server uses HTTPS, then you must set the protocol to `https`.
-        "proxy" => [],
+        // CURLOPT_SSL_VERIFYHOST accepts only 0 (false) or 2 (true)
+        'verifyHost' => true,
 
-        // `decompress` indicates whether or not the response body should be decompressed
-        // automatically. If set to `true` will also remove the 'content-encoding' header
-        // from the responses objects of all decompressed responses
-        // - Node only (XHR cannot turn off decompression)
-        "decompress" => true, // default
+        // CURLOPT_SSL_VERIFYPEER
+        'verifyPeer' => true,
 
-        // If false, fetch will try to parse json responses
-        "rawResponse" => false,
-
-        // CURLOPT_SSL_VERIFYHOST accepts only 0 (false) or 2 (true).
-        // Future versions of libcurl will treat values 1 and 2 as equals
-        "verifyHost" => true, // default
-
-        "verifyPeer" => true, // default
-
-        // Set additional options for curl.
-        "curl" => [],
+        // Additional raw curl options. These are applied last, so they can
+        // override anything fetch sets up.
+        'curl' => [],
     ];
 
+    /**
+     * Set a base url which is prepended to relative request urls
+     * @param string $url
+     */
     public static function baseUrl($url)
     {
-        static::$options["baseUrl"] = $url;
+        static::$options['baseUrl'] = $url;
+    }
+
+    /**
+     * Update default options for all subsequent requests
+     * @param array $options
+     */
+    public static function config(array $options)
+    {
+        static::$options = array_merge(static::$options, $options);
     }
 
     /**
@@ -201,34 +108,34 @@ class Fetch
      */
     public static function get($url, $config = [])
     {
-        return static::request(array_merge($config, ["url" => $url]));
+        return static::request(array_merge($config, ['url' => $url]));
     }
 
     /**
      * Make a post request
      * @throws \Exception
      */
-    public static function post($url, $data, $config = [])
+    public static function post($url, $data = [], $config = [])
     {
-        return static::request(array_merge($config, ["url" => $url, "data" => $data, "method" => static::POST]));
+        return static::request(array_merge($config, ['url' => $url, 'data' => $data, 'method' => static::POST]));
     }
 
     /**
      * Make a put request
      * @throws \Exception
      */
-    public static function put($url, $data, $config = [])
+    public static function put($url, $data = [], $config = [])
     {
-        return static::request(array_merge($config, ["url" => $url, "data" => $data, "method" => static::PUT]));
+        return static::request(array_merge($config, ['url' => $url, 'data' => $data, 'method' => static::PUT]));
     }
 
     /**
      * Make a patch request
      * @throws \Exception
      */
-    public static function patch($url, $data, $config = [])
+    public static function patch($url, $data = [], $config = [])
     {
-        return static::request(array_merge($config, ["url" => $url, "data" => $data, "method" => static::PATCH]));
+        return static::request(array_merge($config, ['url' => $url, 'data' => $data, 'method' => static::PATCH]));
     }
 
     /**
@@ -237,7 +144,16 @@ class Fetch
      */
     public static function delete($url, $config = [])
     {
-        return static::request(array_merge($config, ["url" => $url, "method" => static::DELETE]));
+        return static::request(array_merge($config, ['url' => $url, 'method' => static::DELETE]));
+    }
+
+    /**
+     * Make a head request
+     * @throws \Exception
+     */
+    public static function head($url, $config = [])
+    {
+        return static::request(array_merge($config, ['url' => $url, 'method' => static::HEAD]));
     }
 
     /**
@@ -246,7 +162,7 @@ class Fetch
      */
     public static function options($url, $config = [])
     {
-        return static::request(array_merge($config, ["url" => $url, "method" => static::OPTIONS]));
+        return static::request(array_merge($config, ['url' => $url, 'method' => static::OPTIONS]));
     }
 
     /**
@@ -256,183 +172,191 @@ class Fetch
     {
         static::$handler = curl_init();
 
-        $curl_base_options = [
+        $curlOptions = [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_MAXREDIRS => $request["maxRedirects"],
+            CURLOPT_MAXREDIRS => $request['maxRedirects'],
             CURLOPT_HEADER => true,
-            CURLOPT_SSL_VERIFYPEER => $request["verifyPeer"],
-            CURLOPT_SSL_VERIFYHOST => $request["verifyHost"] === false ? 0 : 2,
+            CURLOPT_SSL_VERIFYPEER => $request['verifyPeer'],
+            CURLOPT_SSL_VERIFYHOST => $request['verifyHost'] === false ? 0 : 2,
             // If an empty string, '', is set, a header containing all supported encoding types is sent
-            CURLOPT_ENCODING => ""
+            CURLOPT_ENCODING => '',
         ];
 
-        if (!empty($request["headers"])) {
+        if (!empty($request['headers'])) {
             $formattedHeaders = [];
 
-            foreach ($request["headers"] as $key => $value) {
+            foreach ($request['headers'] as $key => $value) {
                 $formattedHeaders[] = $key . ': ' . $value;
             }
 
-            $curl_base_options[CURLOPT_HTTPHEADER] = $formattedHeaders;
+            $curlOptions[CURLOPT_HTTPHEADER] = $formattedHeaders;
         }
 
-        if ($request["method"] !== static::GET) {
-            if ($request["method"] === static::POST) {
-                $curl_base_options[CURLOPT_POST] = true;
+        $queryParams = $request['params'] ?? [];
+
+        if ($request['method'] !== static::GET) {
+            if ($request['method'] === static::POST) {
+                $curlOptions[CURLOPT_POST] = true;
             } else {
-                if ($request["method"] === static::HEAD) {
-                    $curl_base_options[CURLOPT_NOBODY] = true;
+                if ($request['method'] === static::HEAD) {
+                    $curlOptions[CURLOPT_NOBODY] = true;
                 }
 
-                $curl_base_options[CURLOPT_CUSTOMREQUEST] = $request["method"];
+                $curlOptions[CURLOPT_CUSTOMREQUEST] = $request['method'];
             }
 
-            $curl_base_options[CURLOPT_POSTFIELDS] = json_encode($request["data"]);
-        } else if (\is_array($request["data"])) {
-            if (strpos($request["url"], '?') !== false) {
-                $request["url"] .= '&';
+            if (static::hasHeader($request['headers'], 'Content-Type', 'application/x-www-form-urlencoded')) {
+                $curlOptions[CURLOPT_POSTFIELDS] = http_build_query($request['data']);
             } else {
-                $request["url"] .= '?';
+                $curlOptions[CURLOPT_POSTFIELDS] = json_encode($request['data']);
             }
-
-            $request["url"] .= urldecode(http_build_query(self::buildHTTPCurlQuery($request["data"])));
+        } elseif (is_array($request['data']) && !empty($request['data'])) {
+            $queryParams = array_merge($request['data'], $queryParams);
         }
 
-        $curl_base_options[CURLOPT_URL] = $request["baseUrl"] . $request["url"];
+        $url = $request['url'] ?? '';
 
-        // supporting deprecated http auth method
-        if (!empty($request['auth'] ?? [])) {
-            // $curl_base_options = \array_merge($curl_base_options, [
-            //     CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-            //     CURLOPT_USERPWD => $request['auth']['username'] . ':' . $request['auth']['password']
-            // ]);
-            $curl_base_options[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
-            $curl_base_options[CURLOPT_USERPWD] = $request['auth']['username'] . ':' . $request['auth']['password'];
+        if (!empty($queryParams)) {
+            $url .= (strpos($url, '?') !== false) ? '&' : '?';
+            $url .= static::buildQueryString($queryParams);
         }
 
-        foreach ($request["curl"] as $key => $value) {
-            $curl_base_options[$key] = $value;
+        // baseUrl only applies to relative urls
+        if (!preg_match('/^https?:\/\//i', $url)) {
+            $url = $request['baseUrl'] . $url;
         }
 
-        if (($request['headers']['Content-Type'] ?? null) === 'application/x-www-form-urlencoded' && $request['method'] !== static::GET) {
-            $curl_base_options[CURLOPT_POSTFIELDS] = http_build_query($request['data']);
+        $curlOptions[CURLOPT_URL] = $url;
+
+        if (!empty($request['auth'])) {
+            $curlOptions[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
+            $curlOptions[CURLOPT_USERPWD] = ($request['auth']['username'] ?? '') . ':' . ($request['auth']['password'] ?? '');
         }
 
-        curl_setopt_array(static::$handler, $curl_base_options);
-
-        if ($request["timeout"] !== null) {
-            curl_setopt(static::$handler, CURLOPT_TIMEOUT, $request["timeout"]);
+        if (($request['timeout'] ?? 0) > 0) {
+            $curlOptions[CURLOPT_TIMEOUT] = $request['timeout'];
         }
 
-        // if ($request["cookie"]) {
-        //     curl_setopt(static::$handler, CURLOPT_COOKIE, $request["cookie"]);
-        // }
+        // user-supplied curl options are applied last so they win
+        foreach ($request['curl'] as $key => $value) {
+            $curlOptions[$key] = $value;
+        }
 
-        // if (self::$cookieFile) {
-        //     curl_setopt(static::$handler, CURLOPT_COOKIEFILE, self::$cookieFile);
-        //     curl_setopt(static::$handler, CURLOPT_COOKIEJAR, self::$cookieFile);
-        // }
+        curl_setopt_array(static::$handler, $curlOptions);
 
-        // if (!empty($request["auth"]["user"])) {
-        //     curl_setopt_array(static::$handler, [
-        //         CURLOPT_HTTPAUTH    => $request["auth"]["method"],
-        //         CURLOPT_USERPWD     => $request["auth"]["user"] . ":" . $request["auth"]["pass"]
-        //     ]);
-        // }
-
-        // if ($request["proxy"]["address"] !== false) {
-        //     curl_setopt_array(static::$handler, [
-        //         CURLOPT_PROXYTYPE       => $request["proxy"]["type"],
-        //         CURLOPT_PROXY           => $request["proxy"]["address"],
-        //         CURLOPT_PROXYPORT       => $request["proxy"]["port"],
-        //         CURLOPT_HTTPPROXYTUNNEL => $request["proxy"]["tunnel"],
-        //         CURLOPT_PROXYAUTH       => $request["proxy"]["auth"]["method"],
-        //         CURLOPT_PROXYUSERPWD    => $request["proxy"]["auth"]["user"] . ":" . $request["proxy"]["auth"]["pass"]
-        //     ]);
-        // }
-
+        $requestStartedAt = microtime(true);
         $response = curl_exec(static::$handler);
         $error = curl_error(static::$handler);
         $info = self::getInfo();
 
+        if (function_exists('crash')) {
+            // outbound calls are prime crash-journey material: url + status
+            // + duration only, never request or response bodies
+            crash()->leaveCrumb("{$request['method']} $url", 'http', [
+                'status' => $info['http_code'] ?? 0,
+                'ms' => round((microtime(true) - $requestStartedAt) * 1000),
+            ], false);
+        }
+
         if ($error) {
-            throw new \Exception($error);
+            throw new \Exception("Fetch: $error [$url]");
         }
 
         // Split the full response in its headers and body
-        $header_size = $info['header_size'];
-        $header = substr($response, 0, $header_size);
-        $body = substr($response, $header_size);
+        $headerSize = $info['header_size'];
+        $header = substr($response, 0, $headerSize);
+        $body = substr($response, $headerSize);
         $httpCode = $info['http_code'];
 
-        if (!$request["rawResponse"]) {
-            $body = json_decode($body);
+        if (!$request['rawResponse']) {
+            if (trim($body) === '') {
+                $body = null;
+            } else {
+                $decoded = json_decode($body);
+
+                // keep the raw body if it isn't valid JSON
+                if ($decoded !== null || strtolower(trim($body)) === 'null') {
+                    $body = $decoded;
+                }
+            }
         }
 
         return (object) [
             // `data` is the response that was provided by the server
-            "data" => $body,
+            'data' => $body,
 
             // `status` is the HTTP status code from the server response
-            "status" => $httpCode,
+            'status' => $httpCode,
 
-            // `headers` the HTTP headers that the server responded with
+            // `headers` the HTTP headers that the server responded with.
             // All header names are lower cased and can be accessed using the bracket notation.
             // Example: `response.headers['content-type']`
-            "headers" => static::parseHeaders($header),
+            'headers' => static::parseHeaders($header),
 
             // `request` is the request that generated this response
-            "request" => $request,
+            'request' => $request,
         ];
-
-        // return new Response($httpCode, $body, $header, self::$jsonOpts);
     }
 
     /**
-     * if PECL_HTTP is not available use a fall back function
-     *
-     * thanks to ricardovermeltfoort@gmail.com
-     * http://php.net/manual/en/function.http-parse-headers.php#112986
+     * Case-insensitively check whether a header is set to a given value
+     */
+    private static function hasHeader(array $headers, string $name, string $value): bool
+    {
+        foreach ($headers as $key => $headerValue) {
+            if (strcasecmp($key, $name) === 0) {
+                return stripos($headerValue, $value) !== false;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Build a query string, keeping array brackets readable: ?page=2&tags[0]=php
+     */
+    private static function buildQueryString(array $params): string
+    {
+        return str_ireplace(['%5B', '%5D'], ['[', ']'], http_build_query(self::buildHTTPCurlQuery($params)));
+    }
+
+    /**
+     * Parse raw response headers into an array with lower cased header names
      * @param string $raw_headers raw headers
      * @return array
-     *
-     * @author Mashape (https://www.mashape.com)
      */
     private static function parseHeaders(string $raw_headers): array
     {
-        if (function_exists('http_parse_headers')) {
-            return \http_parse_headers($raw_headers);
-        } else {
-            $key = '';
-            $headers = array();
+        $key = '';
+        $headers = [];
 
-            foreach (explode("\n", $raw_headers) as $i => $h) {
-                $h = explode(':', $h, 2);
+        foreach (explode("\n", $raw_headers) as $i => $h) {
+            $h = explode(':', $h, 2);
 
-                if (isset($h[1])) {
-                    if (!isset($headers[$h[0]])) {
-                        $headers[$h[0]] = trim($h[1]);
-                    } elseif (is_array($headers[$h[0]])) {
-                        $headers[$h[0]] = array_merge($headers[$h[0]], array(trim($h[1])));
-                    } else {
-                        $headers[$h[0]] = array_merge(array($headers[$h[0]]), array(trim($h[1])));
-                    }
+            if (isset($h[1])) {
+                $headerName = strtolower($h[0]);
 
-                    $key = $h[0];
+                if (!isset($headers[$headerName])) {
+                    $headers[$headerName] = trim($h[1]);
+                } elseif (is_array($headers[$headerName])) {
+                    $headers[$headerName] = array_merge($headers[$headerName], [trim($h[1])]);
                 } else {
-                    if (substr($h[0], 0, 1) == "\t") {
-                        $headers[$key] .= "\r\n\t" . trim($h[0]);
-                    } elseif (!$key) {
-                        $headers[0] = trim($h[0]);
-                    }
+                    $headers[$headerName] = array_merge([$headers[$headerName]], [trim($h[1])]);
+                }
+
+                $key = $headerName;
+            } else {
+                if (substr($h[0], 0, 1) == "\t") {
+                    $headers[$key] .= "\r\n\t" . trim($h[0]);
+                } elseif (!$key) {
+                    $headers[0] = trim($h[0]);
                 }
             }
-
-            return $headers;
         }
-    }
 
+        return $headers;
+    }
 
     public static function getInfo($opt = false)
     {
@@ -454,7 +378,7 @@ class Fetch
      */
     public static function buildHTTPCurlQuery(array $data, $parent = false): array
     {
-        $result = array();
+        $result = [];
 
         foreach ($data as $key => $value) {
             if ($parent) {
