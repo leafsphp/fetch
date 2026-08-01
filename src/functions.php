@@ -16,7 +16,7 @@ if (!function_exists('fetch')) {
         }
 
         if (!$data) {
-            return new Fetch;
+            return new Fetch();
         }
 
         return Fetch::request($data);
