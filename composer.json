@@ -44,7 +44,7 @@
     "require-dev": {
         "pestphp/pest": "*",
         "friendsofphp/php-cs-fixer": "*",
-        "leafs/alchemy": "v5.x-dev"
+        "leafs/alchemy": "^5.0"
     },
     "scripts": {
         "test": "@php vendor/bin/alchemy test",
